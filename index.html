@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Math Problems</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .problem {
+            font-size: 20px;
+            margin: 10px 0;
+        }
+        .page {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .problem {
+            width: 18%;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+        .btn {
+            margin-top: 20px;
+        }
+        .correct {
+            color: green;
+            font-weight: bold;
+        }
+        .incorrect {
+            color: red;
+            font-weight: bold;
+        }
+        @media print {
+            .btn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Random Math Problems (9以内加减法)</h1>
+    <div id="problems" class="page"></div>
+
+    <button class="btn" onclick="generateProblems()">Generate New Problems</button>
+    <button class="btn" onclick="checkAnswers()">Check Answers</button>
+    <button class="btn" onclick="window.print()">Print</button>
+
+    <script>
+        function getRandomNumber(max) {
+            return Math.floor(Math.random() * max);
+        }
+
+        function generateProblems() {
+            const problemsContainer = document.getElementById('problems');
+            problemsContainer.innerHTML = ''; // Clear previous problems
+
+            for (let i = 0; i < 50; i++) {  // Generates 50 problems per page
+                let num1 = getRandomNumber(10); // Random number between 0 and 9
+                let num2 = getRandomNumber(10);
+                const operation = Math.random() > 0.5 ? '+' : '-';
+
+                // Ensure no negative results for subtraction
+                if (operation === '-' && num1 < num2) {
+                    [num1, num2] = [num2, num1]; // Swap the numbers
+                }
+
+                const problemDiv = document.createElement('div');
+                problemDiv.classList.add('problem');
+
+                // Create the math problem and an input for the answer
+                problemDiv.innerHTML = `${num1} ${operation} ${num2} = 
+                    <input type="number" class="answer" data-answer="${operation === '+' ? num1 + num2 : num1 - num2}" />`;
+
+                problemsContainer.appendChild(problemDiv);
+            }
+        }
+
+        function checkAnswers() {
+            const inputs = document.querySelectorAll('.answer');
+            inputs.forEach(input => {
+                const userAnswer = parseInt(input.value);
+                const correctAnswer = parseInt(input.getAttribute('data-answer'));
+
+                if (userAnswer === correctAnswer) {
+                    input.classList.add('correct');
+                    input.classList.remove('incorrect');
+                    input.nextSibling && input.nextSibling.remove();  // Remove any existing feedback
+                    input.insertAdjacentHTML('afterend', `<span class="correct"> ✔ Correct</span>`);
+                } else {
+                    input.classList.add('incorrect');
+                    input.classList.remove('correct');
+                    input.nextSibling && input.nextSibling.remove();  // Remove any existing feedback
+                    input.insertAdjacentHTML('afterend', `<span class="incorrect"> ✘ Incorrect (Correct: ${correctAnswer})</span>`);
+                }
+            });
+        }
+
+        // Initial load
+        generateProblems();
+    </script>
+
+</body>
+</html>
